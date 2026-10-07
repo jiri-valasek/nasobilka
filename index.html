@@ -1,0 +1,749 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Násobilková věž</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: sky scene with a growing toy-brick tower on one side, a calm play panel (problem + big numpad) on the other; stacks on phones. */
+:root {
+  --sky-top: #7cc8f7; --sky-bottom: #d9f1ff; --sky-ink: #173a5c;
+  --sun: #ffcf33; --sun-glow: rgba(255, 207, 51, .30); --moon-cut: 0;
+  --cloud: #ffffff; --cloud-o: .95; --star: #ffffff; --star-o: 0;
+  --grass: #4fb548; --soil: #9a6a44; --window: rgba(255, 255, 255, .62);
+  --panel: #ffffff; --panel-2: #eef5fb; --line: #cfdeec; --ink: #16243b; --muted: #566985;
+  --accent: #1f56d8; --accent-ink: #ffffff; --accent-soft: #e2ebff;
+  --good: #178a4a; --good-soft: #d8f3e3; --bad: #cf3a3a; --bad-soft: #fde3e3;
+  --blank: #fff3bf; --blank-line: #e2a800; --scrim: rgba(10, 24, 50, .45);
+  --b1: #e94b45; --b2: #f6a821; --b3: #2f8fe6; --b4: #3fae5a; --b5: #9a55c9;
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky-top: #0a1433; --sky-bottom: #1e3166; --sky-ink: #cfe0ff;
+    --sun: #f4eccc; --sun-glow: rgba(244, 236, 204, .08); --moon-cut: 1;
+    --cloud: #c9d6f5; --cloud-o: .10; --star: #ffffff; --star-o: 1;
+    --grass: #2d7a3c; --soil: #4d321f; --window: rgba(255, 210, 110, .9);
+    --panel: #121b33; --panel-2: #1b2747; --line: #2a3a63; --ink: #eef3ff; --muted: #9fb0d0;
+    --accent: #7ea4ff; --accent-ink: #0b1430; --accent-soft: #22325c;
+    --good: #4ccf86; --good-soft: #12382a; --bad: #ff7a7a; --bad-soft: #45202a;
+    --blank: #3a3218; --blank-line: #f0c548; --scrim: rgba(0, 0, 0, .6);
+    --b1: #e0544f; --b2: #f0a630; --b3: #3f95e6; --b4: #47b562; --b5: #a066cf;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sky-top: #0a1433; --sky-bottom: #1e3166; --sky-ink: #cfe0ff;
+  --sun: #f4eccc; --sun-glow: rgba(244, 236, 204, .08); --moon-cut: 1;
+  --cloud: #c9d6f5; --cloud-o: .10; --star: #ffffff; --star-o: 1;
+  --grass: #2d7a3c; --soil: #4d321f; --window: rgba(255, 210, 110, .9);
+  --panel: #121b33; --panel-2: #1b2747; --line: #2a3a63; --ink: #eef3ff; --muted: #9fb0d0;
+  --accent: #7ea4ff; --accent-ink: #0b1430; --accent-soft: #22325c;
+  --good: #4ccf86; --good-soft: #12382a; --bad: #ff7a7a; --bad-soft: #45202a;
+  --blank: #3a3218; --blank-line: #f0c548; --scrim: rgba(0, 0, 0, .6);
+  --b1: #e0544f; --b2: #f0a630; --b3: #3f95e6; --b4: #47b562; --b5: #a066cf;
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body { background: var(--panel); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.45; }
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#app { height: 100%; }
+
+.screen { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 440px); }
+.panel { background: var(--panel); border-left: 1px solid var(--line); padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; overflow: auto; min-width: 0; }
+
+/* ---------- Scene ---------- */
+.scene { position: relative; overflow: hidden; min-height: 0; background: linear-gradient(var(--sky-top), var(--sky-bottom)); --ground: 40px; --fh: 30px; }
+.sky { position: absolute; inset: 0; pointer-events: none; }
+.sun { position: absolute; top: 26px; right: 30px; width: 54px; height: 54px; border-radius: 50%; background: var(--sun); box-shadow: 0 0 0 12px var(--sun-glow); overflow: hidden; }
+.sun::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--sky-top); transform: translate(32%, -20%); opacity: var(--moon-cut); }
+.cloud { position: absolute; height: 22px; border-radius: 22px; background: var(--cloud); opacity: var(--cloud-o); }
+.cloud::before, .cloud::after { content: ""; position: absolute; background: var(--cloud); border-radius: 50%; }
+.cloud::before { width: 30px; height: 30px; left: 14px; top: -14px; }
+.cloud::after { width: 22px; height: 22px; left: 36px; top: -9px; }
+.cloud.c1 { width: 86px; top: 70px; left: 8%; }
+.cloud.c2 { width: 70px; top: 130px; right: 16%; }
+.cloud.c3 { width: 64px; top: 34px; left: 46%; }
+.stars { position: absolute; inset: 0 0 35% 0; opacity: var(--star-o);
+  background-image:
+    radial-gradient(1.6px 1.6px at 22px 34px, var(--star) 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 96px 80px, var(--star) 50%, transparent 52%),
+    radial-gradient(1.8px 1.8px at 150px 20px, var(--star) 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 60px 120px, var(--star) 50%, transparent 52%),
+    radial-gradient(1.4px 1.4px at 170px 110px, var(--star) 50%, transparent 52%);
+  background-size: 200px 150px; }
+
+.world { position: absolute; inset: 0; transition: transform .6s ease; }
+.ground { position: absolute; left: 0; right: 0; bottom: 0; height: var(--ground); background: linear-gradient(var(--grass) 0 9px, var(--soil) 9px); }
+.tower { position: absolute; left: 50%; margin-left: -52px; width: 104px; bottom: var(--ground); display: flex; flex-direction: column-reverse; gap: 2px; }
+.floor { position: relative; flex: none; height: var(--fh); background: var(--c); border-radius: 4px;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .32), inset 0 -3px 0 rgba(0, 0, 0, .2); }
+.floor::before { content: ""; position: absolute; left: 16px; top: 26%; width: 14px; height: 48%; border-radius: 2px;
+  background: var(--window); box-shadow: 30px 0 0 var(--window), 60px 0 0 var(--window); }
+.floor[data-n]::after { content: attr(data-n); position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%);
+  font: 700 13px/1 var(--font-display); color: var(--sky-ink); opacity: .75; font-variant-numeric: tabular-nums; }
+.tower.thin .floor { border-radius: 2px; box-shadow: inset 0 2px 0 rgba(255, 255, 255, .3), inset 0 -2px 0 rgba(0, 0, 0, .2); }
+.tower.thin .floor::before { display: none; }
+.floor.drop { animation: drop .5s cubic-bezier(.3, 1.3, .5, 1); }
+.tower.shaking .floor:last-child { animation: wobble .32s ease-in-out infinite; transform-origin: 50% 100%; }
+.floor.falling { animation: fall .7s ease-in forwards; z-index: 2; }
+@keyframes drop { from { transform: translateY(-160px); opacity: 0; } 70% { transform: translateY(3px); opacity: 1; } to { transform: none; } }
+@keyframes wobble { 0%, 100% { transform: rotate(0); } 25% { transform: translateX(-3px) rotate(-3deg); } 75% { transform: translateX(3px) rotate(3deg); } }
+@keyframes fall { to { transform: translate(110px, 320px) rotate(70deg); opacity: 0; } }
+
+.builder { position: absolute; left: calc(50% - 20px); width: 40px; height: 58px; transition: bottom .45s cubic-bezier(.3, 1.4, .5, 1); z-index: 3; }
+.builder svg { display: block; }
+.builder .m-worried { display: none; }
+.builder.worried .m-happy { display: none; }
+.builder.worried .m-worried { display: inline; }
+.builder.worried svg { animation: tremble .25s linear infinite; }
+.builder.hop svg { animation: hop .45s ease-out; }
+@keyframes hop { 40% { transform: translateY(-16px); } }
+@keyframes tremble { 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
+
+.bubble { position: absolute; bottom: calc(100% + 12px); left: 50%; width: max-content; max-width: min(210px, 70vw); transform: translate(-50%, 6px) scale(.9);
+  background: var(--panel); color: var(--ink); border-radius: 14px; padding: 7px 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+  font: 700 1rem/1.25 var(--font-display); text-align: center; text-wrap: balance; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; }
+.bubble::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -8px; border: 8px solid transparent; border-top-color: var(--panel); }
+.bubble.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.goal { position: absolute; left: 50%; width: 200px; margin-left: -100px; border-top: 2px dashed var(--sky-ink); opacity: .7; }
+.goal svg { position: absolute; right: 2px; bottom: 0; }
+.goal-label { position: absolute; left: 0; bottom: 4px; font: 700 13px/1 var(--font-display); color: var(--sky-ink); letter-spacing: .04em; }
+
+/* ---------- Setup ---------- */
+.brand { font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 4vw, 2.6rem); line-height: 1.05; margin: 4px 0 0; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 46ch; }
+.opt { display: flex; flex-direction: column; gap: 8px; }
+.opt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.opt-label { font-weight: 700; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.opt-note { font-size: .9rem; color: var(--ink); }
+.chips { display: grid; gap: 8px; }
+.chips-max { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.chips-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.chip { border: 1px solid var(--line); border-bottom-width: 3px; background: var(--panel-2); border-radius: 12px; padding: 8px 4px;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1.1; min-height: 46px; }
+.chip small { display: block; font-family: var(--font-body); font-weight: 400; font-size: .72rem; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip[aria-pressed="true"] small { color: var(--accent-ink); opacity: .85; }
+.examples { display: flex; flex-direction: column; gap: 8px; }
+.ex-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.ex-row span { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; padding: 2px 10px; border-radius: 8px; background: var(--accent-soft); white-space: nowrap; }
+.cta { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font-family: var(--font-display); font-weight: 800; font-size: 1.35rem;
+  padding: 12px 20px; box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 60%, var(--ink)); }
+.cta:active { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 60%, var(--ink)); }
+.setup .cta { margin-top: auto; }
+
+/* ---------- Game ---------- */
+.play { gap: 10px; }
+.play > * { width: 100%; max-width: 400px; margin-inline: auto; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ghost { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 6px 10px; font-size: .9rem; color: var(--muted); min-height: 38px; }
+.ghost.warn { color: var(--bad); border-color: var(--bad); background: var(--bad-soft); }
+.ghost.icon { width: 40px; padding: 0; display: grid; place-items: center; }
+.progress { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.progress b { font-size: 1.45rem; color: var(--accent); }
+.problem { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .3em; padding-block: 10px 4px;
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 9vw, 3.2rem); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.problem .op { color: var(--muted); font-weight: 700; }
+.blank { min-width: 1.9em; padding: 0 .2em; text-align: center; border-radius: 12px; background: var(--blank); border-bottom: 5px solid var(--blank-line); transition: background .2s, border-color .2s; }
+.blank.empty { color: var(--blank-line); }
+.blank.good { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+.blank.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); animation: nope .3s; }
+.blank.reveal { background: var(--good-soft); border-color: var(--good); color: var(--good); }
+@keyframes nope { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.timer { height: 10px; border-radius: 6px; background: var(--panel-2); overflow: hidden; border: 1px solid var(--line); }
+.timer.off { visibility: hidden; }
+.timer-fill { height: 100%; background: var(--accent); transform-origin: left center; }
+.timer.low .timer-fill { background: var(--bad); }
+.message { min-height: 1.5em; text-align: center; font-weight: 700; color: var(--muted); }
+.message.good { color: var(--good); }
+.message.bad { color: var(--bad); }
+.hintbox { min-height: 70px; border-radius: 12px; padding: 8px; background: var(--accent-soft); visibility: hidden; display: flex; flex-direction: column; gap: 6px; }
+.hintbox.on { visibility: visible; }
+.hint-title { font-size: .85rem; text-align: center; color: var(--ink); }
+.hint-row { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+.hc { display: flex; flex-direction: column; align-items: center; background: var(--panel); border-radius: 7px; padding: 3px 0 2px; }
+.hc b { font-family: var(--font-display); font-size: 1rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.hc small { font-size: .62rem; color: var(--muted); line-height: 1; }
+.pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: auto; }
+.key { height: 58px; border-radius: 14px; border: 1px solid var(--line); border-bottom-width: 4px; background: var(--panel-2);
+  font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; line-height: 1; user-select: none; -webkit-user-select: none; }
+.key:active { transform: translateY(2px); border-bottom-width: 2px; }
+.key.fn { font-size: 1.05rem; color: var(--muted); }
+.key.okk { background: var(--accent); border-color: color-mix(in srgb, var(--accent) 60%, var(--ink)); color: var(--accent-ink); font-size: 1.15rem; }
+
+/* ---------- Win ---------- */
+.win-wrap { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 20; }
+.win-card { background: var(--panel); border-radius: 20px; padding: 22px 22px 20px; width: 100%; max-width: 440px; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, .3); }
+.win-card h2 { font-family: var(--font-display); font-weight: 800; font-size: 2.1rem; line-height: 1; margin: 0; }
+.win-card p { margin: 0; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.stats div { background: var(--panel-2); border-radius: 12px; padding: 8px 10px; }
+.stats dt { font-size: .74rem; color: var(--muted); }
+.stats dd { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.trouble h3 { margin: 0 0 6px; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.tchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tchips span { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; padding: 2px 10px; border-radius: 8px; background: var(--bad-soft); color: var(--ink); white-space: nowrap; }
+.tchips span small { font-family: var(--font-body); font-weight: 400; font-size: .75rem; color: var(--muted); margin-left: 4px; }
+.tchips .none { background: var(--good-soft); font-family: var(--font-body); font-weight: 700; font-size: .95rem; }
+.win-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.win-actions .cta { flex: 1 1 180px; }
+.ghost-btn { flex: 1 1 140px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); font-weight: 700; padding: 12px 16px; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
+
+/* ---------- Narrow ---------- */
+@media (max-width: 760px) {
+  .screen { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(170px, 1fr) auto; }
+  .panel { border-left: 0; border-top: 1px solid var(--line); padding: 14px 16px 16px; overflow: visible; }
+  .setup.screen { height: auto; min-height: 100%; grid-template-rows: 210px auto; }
+  .chips-max { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .key { height: 50px; }
+  .play { gap: 8px; }
+  .problem { padding-block: 4px 0; }
+  .stats dd { font-size: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+
+<div id="app">
+  <section id="setup" class="screen setup">
+    <div class="scene" id="setupScene"></div>
+    <div class="panel">
+      <h1 class="brand">Násobilková věž</h1>
+      <p class="lede">Ahoj Vincente! Za každý příklad, který spočítáš hned napoprvé, postavíš jedno patro. Když se spleteš, patro se rozklepe a ukáže se nápověda. Když se spleteš podruhé, patro spadne.</p>
+
+      <div class="opt">
+        <div class="opt-head"><span class="opt-label" id="lblMax">Násobky do</span><span class="opt-note" id="maxNote"></span></div>
+        <div class="chips chips-max" id="optMax" role="group" aria-labelledby="lblMax"></div>
+      </div>
+      <div class="opt">
+        <div class="opt-head"><span class="opt-label" id="lblTime">Čas na jeden příklad</span></div>
+        <div class="chips chips-4" id="optTime" role="group" aria-labelledby="lblTime"></div>
+      </div>
+      <div class="opt">
+        <div class="opt-head"><span class="opt-label" id="lblHeight">Jak vysoká věž</span></div>
+        <div class="chips chips-4" id="optHeight" role="group" aria-labelledby="lblHeight"></div>
+      </div>
+      <div class="examples">
+        <span class="opt-label">Příklady se budou střídat</span>
+        <div class="ex-row" id="exRow"></div>
+      </div>
+      <button id="startBtn" class="cta">Začít stavět</button>
+    </div>
+  </section>
+
+  <section id="game" class="screen game" hidden>
+    <div class="scene" id="gameScene"></div>
+    <div class="panel play">
+      <div class="topbar">
+        <button id="quitBtn" class="ghost">← Nastavení</button>
+        <div class="progress"><b id="progNum">0</b> / <span id="progTarget">20</span> pater</div>
+        <button id="muteBtn" class="ghost icon" aria-label="Vypnout zvuk"></button>
+      </div>
+      <div class="problem" id="problem"></div>
+      <div class="timer" id="timer"><div class="timer-fill" id="timerFill"></div></div>
+      <div class="message" id="message" role="status" aria-live="polite"></div>
+      <div class="hintbox" id="hintbox" aria-live="polite">
+        <div class="hint-title">Řada násobků čísla <b id="hintNum"></b></div>
+        <div class="hint-row" id="hintRow"></div>
+      </div>
+      <div class="pad" id="pad"></div>
+    </div>
+  </section>
+
+  <div class="win-wrap" id="win" hidden>
+    <div class="win-card" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+      <h2 id="winTitle">Věž je hotová!</h2>
+      <p id="winLead"></p>
+      <dl class="stats">
+        <div><dt>Příkladů</dt><dd id="stAsked"></dd></div>
+        <div><dt>Napoprvé dobře</dt><dd id="stFirst"></dd></div>
+        <div><dt>Čas stavby</dt><dd id="stTime"></dd></div>
+      </dl>
+      <div class="trouble">
+        <h3>Tyhle příklady zlobily</h3>
+        <div class="tchips" id="troubleList"></div>
+      </div>
+      <div class="win-actions">
+        <button id="againBtn" class="cta">Stavět znovu</button>
+        <button id="setupBtn" class="ghost-btn">Změnit nastavení</button>
+      </div>
+    </div>
+  </div>
+  <canvas id="confetti" hidden></canvas>
+</div>
+
+<script>
+(() => {
+  const NAME = "Vincent", NAME_VOC = "Vincente";   // jméno hráče (1. a 5. pád)
+  const MUL = "·";      // znaménko násobení (jako v sešitě); pro „×“ stačí změnit tady
+  const DIV = ":";
+  const $ = (s) => document.querySelector(s);
+  const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Nastavení ---------- */
+  const MAXES = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const TIMES = [{ v: 3, l: "3 s" }, { v: 5, l: "5 s" }, { v: 10, l: "10 s" }, { v: 0, l: "∞", s: "bez limitu" }];
+  const HEIGHTS = [10, 15, 20, 30];
+  const S = { max: 5, time: 10, target: 20, muted: false };
+  try {
+    const saved = JSON.parse(localStorage.getItem("nasobilkova-vez") || "null");
+    if (saved) {
+      if (MAXES.includes(saved.max)) S.max = saved.max;
+      if (TIMES.some((t) => t.v === saved.time)) S.time = saved.time;
+      if (HEIGHTS.includes(saved.target)) S.target = saved.target;
+      S.muted = !!saved.muted;
+    }
+  } catch (e) {}
+  const save = () => { try { localStorage.setItem("nasobilkova-vez", JSON.stringify(S)); } catch (e) {} };
+
+  function chips(container, items, getVal, setVal) {
+    container.innerHTML = "";
+    items.forEach((it) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.id = container.id + "-" + it.v;
+      b.innerHTML = it.l + (it.s ? `<small>${it.s}</small>` : "");
+      b.setAttribute("aria-pressed", String(getVal() === it.v));
+      b.addEventListener("click", () => {
+        setVal(it.v);
+        container.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+        save(); updateNotes();
+      });
+      container.appendChild(b);
+    });
+  }
+  chips($("#optMax"), MAXES.map((v) => ({ v, l: String(v) })), () => S.max, (v) => (S.max = v));
+  chips($("#optTime"), TIMES, () => S.time, (v) => (S.time = v));
+  chips($("#optHeight"), HEIGHTS.map((v) => ({ v, l: String(v), s: "pater" })), () => S.target, (v) => (S.target = v));
+
+  function updateNotes() {
+    $("#maxNote").textContent = S.max === 2 ? "jen násobky 2" : `násobky 2 až ${S.max}`;
+    const t = Math.min(S.max, 4), k = 7;
+    $("#exRow").innerHTML = [
+      `${t} ${MUL} ${k} = ?`, `? ${MUL} ${t} = ${t * k}`, `${t * 6} ${DIV} ? = 6`, `? ${DIV} ${t} = 5`,
+    ].map((x) => `<span>${x}</span>`).join("");
+  }
+  updateNotes();
+
+  /* ---------- Scéna s věží ---------- */
+  const BUILDER = `<svg viewBox="0 0 40 58" width="40" height="58" aria-hidden="true">
+    <rect x="12.5" y="44" width="6" height="11" rx="2" fill="#2b3a67"/>
+    <rect x="21.5" y="44" width="6" height="11" rx="2" fill="#2b3a67"/>
+    <rect x="10.5" y="53" width="9" height="5" rx="2" fill="#4a2f1c"/>
+    <rect x="20.5" y="53" width="9" height="5" rx="2" fill="#4a2f1c"/>
+    <rect x="5" y="29" width="6" height="13" rx="3" fill="#f2c39b"/>
+    <rect x="29" y="22" width="6" height="13" rx="3" fill="#f2c39b" transform="rotate(-25 32 28)"/>
+    <rect x="9.5" y="27" width="21" height="19" rx="5" fill="#ff8a1f"/>
+    <rect x="9.5" y="36" width="21" height="3" fill="#fff3c4"/>
+    <circle cx="20" cy="18.5" r="9" fill="#f6cba4"/>
+    <path d="M10.6 17 a9.4 9.4 0 0 1 18.8 0 z" fill="#ffd23f"/>
+    <rect x="8" y="15.6" width="24" height="3" rx="1.5" fill="#f2b705"/>
+    <rect x="18.8" y="8.5" width="2.4" height="7" rx="1" fill="#f2b705"/>
+    <circle cx="16.6" cy="21" r="1.25" fill="#22202a"/>
+    <circle cx="23.4" cy="21" r="1.25" fill="#22202a"/>
+    <circle cx="14.3" cy="23.6" r="1.6" fill="#f29a8a" opacity=".6"/>
+    <circle cx="25.7" cy="23.6" r="1.6" fill="#f29a8a" opacity=".6"/>
+    <path class="m-happy" d="M16.8 24.2 q3.2 3 6.4 0" stroke="#22202a" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path class="m-worried" d="M16.8 26.2 q3.2 -2.4 6.4 0" stroke="#22202a" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+  </svg>`;
+  const FLAG = `<svg width="26" height="30" viewBox="0 0 26 30" aria-hidden="true"><rect x="2" y="0" width="2.4" height="30" rx="1" fill="currentColor"/><path d="M4.4 1 L24 6.5 L4.4 12 z" fill="var(--b1)"/></svg>`;
+
+  class Scene {
+    constructor(el, { goal = true } = {}) {
+      this.el = el; this.goalOn = goal; this.height = 0; this.target = 10; this.step = 32; this.groundH = 40;
+      el.innerHTML = `<div class="sky"><span class="stars"></span><span class="sun"></span><span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span></div>
+        <div class="world"><div class="ground"></div><div class="goal"><span class="goal-label">cíl</span>${FLAG}</div><div class="tower"></div><div class="builder"><div class="bubble" aria-live="polite"></div>${BUILDER}</div></div>`;
+      this.bubble = el.querySelector(".bubble");
+      this.world = el.querySelector(".world");
+      this.tower = el.querySelector(".tower");
+      this.builder = el.querySelector(".builder");
+      this.goal = el.querySelector(".goal");
+      this.goal.style.color = "var(--sky-ink)";
+      new ResizeObserver(() => this.layout()).observe(el);
+    }
+    layout() {
+      const H = this.el.clientHeight;
+      if (!H) return;
+      const g = H < 280 ? 26 : 40;
+      const avail = H - g - 58 - 40;
+      const n = Math.max(this.target || this.height, 1);
+      const step = Math.max(11, Math.min(34, Math.floor(avail / n)));
+      this.groundH = g; this.step = step;
+      this.el.style.setProperty("--ground", g + "px");
+      this.el.style.setProperty("--fh", step - 2 + "px");
+      this.tower.classList.toggle("thin", step < 20);
+      this.goal.hidden = !this.goalOn;
+      this.goal.style.bottom = g + this.target * step - 2 + "px";
+      this.place();
+    }
+    place() {
+      const top = this.groundH + Math.max(0, this.height * this.step - 2);
+      this.builder.style.bottom = top + "px";
+      const need = top + 58 + 34;
+      const off = Math.max(0, need - this.el.clientHeight);
+      this.world.style.transform = `translateY(${off}px)`;
+    }
+    setTarget(n) { this.target = n; this.layout(); }
+    setHeight(n, anim) {
+      const live = [...this.tower.children].filter((f) => !f.classList.contains("falling"));
+      let count = live.length;
+      while (count < n) {
+        const f = document.createElement("div");
+        f.className = "floor" + (anim ? " drop" : "");
+        f.style.setProperty("--c", `var(--b${(count % 5) + 1})`);
+        if ((count + 1) % 5 === 0) f.dataset.n = count + 1;
+        this.tower.appendChild(f);
+        count++;
+      }
+      while (count > n) {
+        const f = live[count - 1];
+        if (anim) { f.classList.add("falling"); setTimeout(() => f.remove(), 750); } else f.remove();
+        count--;
+      }
+      this.height = n;
+      this.place();
+    }
+    say(text, ms) {
+      clearTimeout(this.sayT);
+      this.bubble.textContent = text;
+      this.bubble.classList.add("show");
+      if (ms) this.sayT = setTimeout(() => this.bubble.classList.remove("show"), ms);
+    }
+    hush() { clearTimeout(this.sayT); this.bubble.classList.remove("show"); }
+    shake(on) { this.tower.classList.toggle("shaking", on); }
+    worried(on) { this.builder.classList.toggle("worried", on); }
+    hop() { this.builder.classList.remove("hop"); void this.builder.offsetWidth; this.builder.classList.add("hop"); }
+  }
+
+  const setupScene = new Scene($("#setupScene"), { goal: false });
+  setupScene.setTarget(8);
+  setupScene.setHeight(5, false);
+  setupScene.say(`Ahoj ${NAME_VOC}! Pojď se mnou stavět věž.`);
+  const scene = new Scene($("#gameScene"));
+
+  /* ---------- Zvuky ---------- */
+  let actx = null;
+  function audio() {
+    if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+    if (actx.state === "suspended") actx.resume();
+    return actx;
+  }
+  function tone(f, d, { type = "triangle", at = 0, vol = 0.18, slide } = {}) {
+    if (S.muted) return;
+    const a = audio(); if (!a) return;
+    const t = a.currentTime + at;
+    const o = a.createOscillator(), gn = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    gn.gain.setValueAtTime(0.0001, t);
+    gn.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+    gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(gn).connect(a.destination);
+    o.start(t); o.stop(t + d + 0.03);
+  }
+  function rumble(d) {
+    if (S.muted) return;
+    const a = audio(); if (!a) return;
+    const len = Math.floor(a.sampleRate * d), buf = a.createBuffer(1, len, a.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+    const src = a.createBufferSource(), flt = a.createBiquadFilter(), gn = a.createGain();
+    flt.type = "lowpass"; flt.frequency.value = 700; gn.gain.value = 0.35;
+    src.buffer = buf; src.connect(flt).connect(gn).connect(a.destination); src.start();
+  }
+  const SFX = {
+    build() { tone(523, 0.12); tone(784, 0.2, { at: 0.09 }); },
+    wrong() { tone(330, 0.18, { type: "square", vol: 0.06, slide: 250 }); tone(250, 0.25, { type: "square", vol: 0.06, at: 0.16, slide: 180 }); },
+    saved() { tone(587, 0.12); tone(698, 0.18, { at: 0.08 }); },
+    crash() { rumble(0.6); tone(200, 0.5, { type: "sawtooth", vol: 0.06, slide: 60 }); },
+    win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.3, { at: i * 0.13 })); tone(1319, 0.7, { at: 0.55 }); },
+  };
+  const ICON_ON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>`;
+  const ICON_OFF = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>`;
+  function paintMute() {
+    $("#muteBtn").innerHTML = S.muted ? ICON_OFF : ICON_ON;
+    $("#muteBtn").setAttribute("aria-label", S.muted ? "Zapnout zvuk" : "Vypnout zvuk");
+  }
+  paintMute();
+  $("#muteBtn").addEventListener("click", () => { S.muted = !S.muted; paintMute(); save(); });
+
+  /* ---------- Příklady ---------- */
+  // t = číslo, jehož násobky procvičujeme, k = 1..10, p = t·k
+  function makeProblem({ t, k }) {
+    const p = t * k;
+    switch (rand(0, 6)) {
+      case 0: return { t, k, tokens: [t, MUL, k, "=", null], answer: p, hint: t };
+      case 1: return { t, k, tokens: [k, MUL, t, "=", null], answer: p, hint: t };
+      case 2: return { t, k, tokens: [t, MUL, null, "=", p], answer: k, hint: t };
+      case 3: return { t, k, tokens: [null, MUL, t, "=", p], answer: k, hint: t };
+      case 4: return { t, k, tokens: [p, DIV, t, "=", null], answer: k, hint: t };
+      case 5: return { t, k, tokens: [p, DIV, null, "=", k], answer: t, hint: k };
+      default: return { t, k, tokens: [null, DIV, t, "=", k], answer: p, hint: t };
+    }
+  }
+
+  /* ---------- Hra ---------- */
+  let G = null;
+  const later = (fn, ms) => { const g = G; setTimeout(() => { if (G === g && !g.over) fn(); }, ms); };
+
+  function pickPair() {
+    const i = G.retry.findIndex((r) => r.due <= G.count);
+    if (i >= 0) return G.retry.splice(i, 1)[0];
+    let t, k, tries = 0;
+    do { t = rand(2, S.max); k = rand(1, 10); tries++; }
+    while (tries < 12 && G.last && ((G.last.t === t && G.last.k === k) || (k === 1 && Math.random() < 0.6)));
+    return { t, k };
+  }
+
+  function showScreen(id) {
+    $("#setup").hidden = id !== "setup";
+    $("#game").hidden = id !== "game";
+    $("#win").hidden = true;
+  }
+
+  function startGame() {
+    audio();
+    G = { height: 0, asked: 0, firstOk: 0, count: 0, trouble: new Map(), retry: [], last: null, cur: null,
+      attempt: 1, input: "", busy: true, over: false, start: Date.now(), timerOn: false, raf: 0 };
+    $("#progTarget").textContent = S.target;
+    $("#progNum").textContent = 0;
+    showScreen("game");
+    scene.setTarget(S.target);
+    scene.setHeight(0, false);
+    scene.shake(false); scene.worried(false);
+    scene.say(pick([`Jdeme na to, ${NAME_VOC}!`, `Tak stavíme, ${NAME_VOC}!`, `${S.target} pater? To dáme!`]), 2600);
+    next(true);
+  }
+
+  function next(first) {
+    G.attempt = 1; G.input = ""; G.count++;
+    const pair = pickPair();
+    G.last = pair; G.cur = makeProblem(pair); G.asked++;
+    renderProblem();
+    hideHint();
+    scene.shake(false); scene.worried(false);
+    setMessage(first ? "Napiš výsledek. Zkontroluje se sám." : "");
+    G.busy = false;
+    startTimer(S.time);
+  }
+
+  function renderProblem() {
+    const el = $("#problem");
+    el.innerHTML = "";
+    G.cur.tokens.forEach((tok) => {
+      const s = document.createElement("span");
+      if (tok === null) { s.id = "blank"; s.className = "blank empty"; s.textContent = "?"; }
+      else { s.className = typeof tok === "number" ? "num" : "op"; s.textContent = tok; }
+      el.appendChild(s);
+    });
+  }
+  function paintBlank(state, text) {
+    const b = $("#blank");
+    b.textContent = text ?? (G.input || "?");
+    b.className = "blank" + (!G.input && !text ? " empty" : "") + (state ? " " + state : "");
+  }
+  function setMessage(text, kind) { const m = $("#message"); m.textContent = text; m.className = "message" + (kind ? " " + kind : ""); }
+  function showHint(n) {
+    $("#hintNum").textContent = n;
+    $("#hintRow").innerHTML = Array.from({ length: 10 }, (_, i) => `<div class="hc"><b>${n * (i + 1)}</b><small>${i + 1}.</small></div>`).join("");
+    $("#hintbox").classList.add("on");
+  }
+  function hideHint() { $("#hintbox").classList.remove("on"); }
+
+  function startTimer(sec) {
+    stopTimer();
+    const bar = $("#timer");
+    if (!sec) { bar.classList.add("off"); return; }
+    bar.classList.remove("off", "low");
+    G.dur = sec * 1000; G.deadline = performance.now() + G.dur; G.timerOn = true;
+    const tick = () => {
+      if (!G.timerOn) return;
+      const left = G.deadline - performance.now();
+      const f = Math.max(0, left / G.dur);
+      $("#timerFill").style.transform = `scaleX(${f})`;
+      bar.classList.toggle("low", f < 0.3);
+      if (left <= 0) { G.timerOn = false; wrong(true); return; }
+      G.raf = requestAnimationFrame(tick);
+    };
+    $("#timerFill").style.transform = "scaleX(1)";
+    G.raf = requestAnimationFrame(tick);
+  }
+  function stopTimer() { if (G) { G.timerOn = false; cancelAnimationFrame(G.raf); } }
+  document.addEventListener("visibilitychange", () => {
+    if (!G || !G.timerOn) return;
+    if (document.hidden) G.paused = G.deadline - performance.now();
+    else if (G.paused != null) { G.deadline = performance.now() + G.paused; G.paused = null; }
+  });
+
+  function press(d) {
+    if (!G || G.busy || G.over) return;
+    if (G.input.length >= 3) return;
+    if (G.input === "" && d === "0" && String(G.cur.answer) !== "0") { /* nula na začátku nedává smysl */ }
+    G.input += d;
+    paintBlank();
+    if (G.input.length >= String(G.cur.answer).length) check();
+  }
+  function back() { if (!G || G.busy || G.over) return; G.input = G.input.slice(0, -1); paintBlank(); }
+  function submit() { if (!G || G.busy || G.over || !G.input) return; check(); }
+  function check() { stopTimer(); Number(G.input) === G.cur.answer ? correct() : wrong(false); }
+
+  const PRAISE = ["Výborně!", "Paráda!", "Přesně tak!", "Super!", "Jde ti to!", "Bezva!", "Šikula!"];
+
+  function correct() {
+    G.busy = true;
+    paintBlank("good");
+    if (G.attempt === 1) {
+      G.firstOk++;
+      G.height++;
+      scene.setHeight(G.height, true);
+      scene.hop();
+      SFX.build();
+      $("#progNum").textContent = G.height;
+      if (G.height >= S.target) { setMessage("Poslední patro!", "good"); later(win, 900); }
+      else {
+        let p = pick(PRAISE);
+        if (Math.random() < 0.3) p = `${p.slice(0, -1)}, ${NAME_VOC}!`;
+        setMessage(`${p} Patro ${G.height} stojí.`, "good");
+        if (G.height === S.target - 1) scene.say(`Už jen jedno patro, ${NAME_VOC}!`, 2200);
+        else if (G.height === Math.ceil(S.target / 2)) scene.say(`Půlka věže! Jsi skvělý parťák, ${NAME_VOC}.`, 2400);
+        else if (G.height % 5 === 0) scene.say(`Už ${G.height} pater, ${NAME_VOC}!`, 2000);
+        later(() => next(), 850);
+      }
+    } else {
+      scene.shake(false); scene.worried(false);
+      SFX.saved();
+      setMessage(G.height ? "Správně! Patro vydrželo." : "Správně!", "good");
+      if (G.height) scene.say(`Uf, zachránil jsi ho, ${NAME_VOC}!`, 1600);
+      later(() => next(), 1100);
+    }
+  }
+
+  function wrong(timeout) {
+    G.busy = true;
+    const { t, k, answer, hint } = G.cur;
+    if (G.attempt === 1) {
+      G.attempt = 2;
+      const key = `${t}|${k}`;
+      G.trouble.set(key, (G.trouble.get(key) || 0) + 1);
+      if (!G.retry.some((r) => r.t === t && r.k === k)) G.retry.push({ t, k, due: G.count + rand(3, 5) });
+      SFX.wrong();
+      paintBlank("bad", G.input || "?");
+      if (G.height > 0) scene.shake(true);
+      scene.worried(true);
+      scene.say(G.height ? `Pozor, ${NAME_VOC}, klepe se to!` : `Zkus to ještě jednou, ${NAME_VOC}.`, 2200);
+      setMessage((timeout ? "Čas vypršel! " : "Ještě jednou! ") + "Mrkni na řadu násobků.", "bad");
+      showHint(hint);
+      later(() => {
+        G.input = ""; paintBlank();
+        G.busy = false;
+        startTimer(S.time ? S.time * 2 : 0);
+      }, 650);
+    } else {
+      scene.shake(false);
+      paintBlank("reveal", String(answer));
+      if (G.height > 0) {
+        G.height--;
+        scene.setHeight(G.height, true);
+        $("#progNum").textContent = G.height;
+        SFX.crash();
+        setMessage(`Patro spadlo. Správně je ${answer}.`, "bad");
+        scene.say(`Nevadí, ${NAME_VOC}. Postavíme ho znova!`, 2200);
+      } else {
+        SFX.wrong();
+        setMessage(`Správně je ${answer}. Příště to dáš!`, "bad");
+      }
+      later(() => next(), 2300);
+    }
+  }
+
+  function fmtTime(s) { const m = Math.floor(s / 60), r = s % 60; return `${m}:${String(r).padStart(2, "0")}`; }
+
+  function win() {
+    G.over = true; stopTimer();
+    const secs = Math.round((Date.now() - G.start) / 1000);
+    $("#winTitle").textContent = `${NAME_VOC}, věž je hotová!`;
+    scene.say(`Díky, ${NAME_VOC}! Jsi mistr stavitel.`);
+    $("#winLead").textContent = `Postavil jsi věž o ${S.target} patrech. Násobky do ${S.max}, ${S.time ? S.time + " s na příklad" : "bez časového limitu"}.`;
+    $("#stAsked").textContent = G.asked;
+    $("#stFirst").textContent = `${G.firstOk} (${Math.round((G.firstOk / G.asked) * 100)} %)`;
+    $("#stTime").textContent = fmtTime(secs);
+    const list = [...G.trouble.entries()].sort((a, b) => b[1] - a[1]);
+    $("#troubleList").innerHTML = list.length
+      ? list.map(([key, n]) => { const [t, k] = key.split("|"); return `<span>${t} ${MUL} ${k}${n > 1 ? `<small>${n}×</small>` : ""}</span>`; }).join("")
+      : `<span class="none">Žádný! Všechno napoprvé.</span>`;
+    $("#win").hidden = false;
+    scene.worried(false);
+    SFX.win();
+    confetti();
+    $("#againBtn").focus();
+  }
+
+  function confetti() {
+    if (reduceMotion) return;
+    const c = $("#confetti"), ctx = c.getContext("2d"), dpr = window.devicePixelRatio || 1;
+    const W = window.innerWidth, H = window.innerHeight;
+    c.width = W * dpr; c.height = H * dpr; c.hidden = false;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cs = getComputedStyle(document.documentElement);
+    const cols = ["--b1", "--b2", "--b3", "--b4", "--b5"].map((v) => cs.getPropertyValue(v).trim());
+    const ps = Array.from({ length: 150 }, () => ({
+      x: Math.random() * W, y: -20 - Math.random() * H * 0.6, vx: (Math.random() - 0.5) * 2.4, vy: 2 + Math.random() * 3,
+      r: Math.random() * 6.3, vr: (Math.random() - 0.5) * 0.3, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: pick(cols),
+    }));
+    const t0 = performance.now();
+    (function frame(t) {
+      ctx.clearRect(0, 0, W, H);
+      ps.forEach((p) => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.03; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+      });
+      if (t - t0 < 3600) requestAnimationFrame(frame); else { ctx.clearRect(0, 0, W, H); c.hidden = true; }
+    })(t0);
+  }
+
+  function quit() {
+    if (G) { G.over = true; stopTimer(); }
+    G = null;
+    showScreen("setup");
+  }
+
+  /* ---------- Ovládání ---------- */
+  const pad = $("#pad");
+  ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0", "ok"].forEach((k) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.id = "key-" + k;
+    if (k === "back") { b.className = "key fn"; b.textContent = "Smazat"; b.setAttribute("aria-label", "Smazat číslici"); b.addEventListener("click", back); }
+    else if (k === "ok") { b.className = "key okk"; b.textContent = "Hotovo"; b.addEventListener("click", submit); }
+    else { b.className = "key"; b.textContent = k; b.addEventListener("click", () => press(k)); }
+    pad.appendChild(b);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (!G || G.over || $("#game").hidden) return;
+    if (/^[0-9]$/.test(e.key)) { press(e.key); e.preventDefault(); }
+    else if (e.key === "Backspace") { back(); e.preventDefault(); }
+    else if (e.key === "Enter") { submit(); e.preventDefault(); }
+  });
+
+  let quitArmed = null;
+  $("#quitBtn").addEventListener("click", () => {
+    const b = $("#quitBtn");
+    if (quitArmed) { clearTimeout(quitArmed); quitArmed = null; b.textContent = "← Nastavení"; b.classList.remove("warn"); quit(); return; }
+    b.textContent = "Opravdu skončit?"; b.classList.add("warn");
+    quitArmed = setTimeout(() => { quitArmed = null; b.textContent = "← Nastavení"; b.classList.remove("warn"); }, 3000);
+  });
+  $("#startBtn").addEventListener("click", startGame);
+  $("#againBtn").addEventListener("click", startGame);
+  $("#setupBtn").addEventListener("click", quit);
+})();
+</script>
+
+</body></html>
